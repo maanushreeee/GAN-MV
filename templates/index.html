@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="../static/styles/index.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <title>Home</title>
+</head>
+<body>
+  <div class="container">
+    <div class="left-section">
+      <h1>Image Enhancement and Synthesis for  <br> Blood Smear Data</h1>
+    </div>
+    <div class="right-section">
+      <div class="feature">
+        <h2>Image Enhancement</h2>
+        <p>Apply various machine vision techniques to enhance your image.</p>
+        <a href="{{ url_for('mv_page') }}"><button>Explore</button></a>
+      </div>
+      <div class="feature">
+        <h2>Image Synthesis</h2>
+        <p>Generate images for ALL Dataset for data augmentation.</p>
+        <a href="{{ url_for('gan_page') }}"><button>Explore</button></a>
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

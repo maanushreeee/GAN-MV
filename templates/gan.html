@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAN Image Generation</title>
+  <link rel="stylesheet" href="../static/styles/gan.css">
+</head>
+<body>
+  <h1>Image Synthesis for Acute Lymphoblastic Luekemia</h1>
+  <div class="container"> 
+      <div class="form-group">
+          <label for="cataract-type">Select ALL Type:</label>
+          <select id="cataract-type">
+              <option value=""> Select Type </option>
+              <option value="early">Early</option>
+              <option value="benign">Benign</option>
+              <option value="pre">Pre</option>
+              <option value="pro">Pro</option>
+          </select>
+      </div>
+      
+      <div class="form-group">
+          <label for="image-count">Number of Images to Generate:</label>
+          <select id="image-count">
+              <option value=""> Select Count </option>
+              <option value="20">20 Images</option>
+              <option value="50">50 Images</option>
+              <option value="70">70 Images</option>
+              <option value="100">100 Images</option>
+              <option value="150">150 Images</option>
+          </select>
+      </div>
+      
+      <button id="generate-btn" disabled>Generate Images</button>
+      
+      <div class="loading">
+          <div class="spinner"></div>
+          <p>Generating images, please wait...</p>
+      </div>
+      
+      <div class="images-container" id="images-container">
+        <h3>Preview of Generated Images</h3>
+        <div class="image-grid" id="image-grid"></div>
+        <div class="download-btn">
+            <a href="#" class="download-link" id="download-btn">Download</a>
+        </div>
+      </div>
+  </div>
+
+  <script>
+      // Get necessary DOM elements
+      const cataractTypeSelect = document.getElementById('cataract-type');
+      const imageCountSelect = document.getElementById('image-count');
+      const generateBtn = document.getElementById('generate-btn');
+      const imagesContainer = document.getElementById('images-container');
+      const imageGrid = document.getElementById('image-grid');
+      const downloadBtn = document.getElementById('download-btn');
+      const loadingIndicator = document.querySelector('.loading');
+      
+      // Current selection state
+      let currentCataractType = '';
+      
+      // Enable or disable the generate button based on selections
+      function updateButtonState() {
+          if (cataractTypeSelect.value && imageCountSelect.value) {
+              generateBtn.disabled = false;
+          } else {
+              generateBtn.disabled = true;
+          }
+      }
+      
+      // Add event listeners to selects
+      cataractTypeSelect.addEventListener('change', updateButtonState);
+      imageCountSelect.addEventListener('change', updateButtonState);
+      
+      // Generate images on button click
+      generateBtn.addEventListener('click', function() {
+          // Show loading indicator
+          loadingIndicator.style.display = 'block';
+          imagesContainer.classList.remove('active');
+          imageGrid.innerHTML = '';
+          
+          // Get selected values
+          currentCataractType = cataractTypeSelect.value;
+          const imageCount = imageCountSelect.value;
+          
+          // Call API to generate images
+          fetch('/generate-images', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  cataractType: currentCataractType,
+                  imageCount: imageCount
+              }),
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  displayImages(data.images);
+              } else {
+                  alert('Error: ' + (data.error || 'Failed to generate images'));
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('Error generating images. Please try again.');
+          })
+          .finally(() => {
+              loadingIndicator.style.display = 'none';
+          });
+      });
+      
+      // Function to display generated images
+      function displayImages(imagePaths) {
+          imageGrid.innerHTML = '';
+          
+          // Limit to maximum 5 images
+          const displayedImages = imagePaths.slice(0, 5);
+          
+          displayedImages.forEach((path, index) => {
+              const imageItem = document.createElement('div');
+              imageItem.className = 'image-item';
+              
+              const img = document.createElement('img');
+              // Make sure the path includes the static folder
+              img.src = '/' + path;
+              img.alt = `${currentCataractType} cataract image ${index + 1}`;
+              
+              imageItem.appendChild(img);
+              imageGrid.appendChild(imageItem);
+          });
+          
+          // Update download link - still downloads all images
+          downloadBtn.href = `/download/${currentCataractType}`;
+          
+          // Show images container
+          imagesContainer.classList.add('active');
+      }
+  </script>
+</body>
+</html>
